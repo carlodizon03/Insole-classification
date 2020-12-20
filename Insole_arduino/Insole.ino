@@ -93,11 +93,11 @@ void sendDataCollectionData()
     Serial.println(accel_y);
     Serial.print("z");
     Serial.println(accel_z);
-    Serial.print("a");
     accel_x = "";
     accel_y = "";
     accel_z = "";
   #endif
+    Serial.print("a");
     Serial.println(s1_data);
     Serial.print("b");
     Serial.println(s2_data);
@@ -133,24 +133,24 @@ void setup() {
   Serial.begin(115200);
   
   #if defined(WITH_ACCEL)
-  accel.initialize();
-  Serial.println(accel.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
- 
-  Serial.println("Updating internal sensor offsets...");
-
-  Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
-  Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
-  Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
+    accel.initialize();
+    Serial.println(accel.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
   
-  Serial.print("\n");
-  accel.setXAccelOffset(-937);
-  accel.setYAccelOffset(-2561);
-  accel.setZAccelOffset(1419);
-  Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
-  Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
-  Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
- #endif
-  setTimerInterval_(100, &timer_id);
+    Serial.println("Updating internal sensor offsets...");
+
+    Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
+    Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
+    Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
+    
+    Serial.print("\n");
+    accel.setXAccelOffset(-937);
+    accel.setYAccelOffset(-2561);
+    accel.setZAccelOffset(1419);
+    Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
+    Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
+    Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
+  #endif
+  setTimerInterval_(1000, &timer_id);
   Timer.disable(timer_id);
 }
 
