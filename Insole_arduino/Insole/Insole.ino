@@ -14,7 +14,8 @@
 
 SimpleTimer Timer;
 int timer_id;
-
+int prompt_counter = 3;
+int prompt_timer_id;
 /**
  *  Uncomment this line if you are gonna use accelerometer
  *  Comment if there is no connected accelerometer
@@ -25,9 +26,6 @@ int timer_id;
   MPU6050 accel;
   int16_t ax, ay, az;
   #define OUTPUT_READABLE_accel
-  String accel_x;
-  String accel_y;
-  String accel_z;
 #endif
 
 // GND/5V is the left most pin facing the top of insole
@@ -42,28 +40,27 @@ String s4_data;
 
 String visualization_data;
 /*
- * Sending flag to be switched by timer callback
+ * Ending flag to be switched by timer callback
  */
-bool isSend = false;
+bool isEnd = false;
 
 /*
- * Timer callback to switch the sending flag
+ * Timer callback to switch the Ending flag
  */
-void setSendFlag()
+void setEndFlag()
 {
-  isSend = true;
+  isEnd = true;
 }
 
 /**
  * Sending Modes
  *  0 - data collection
  *  1 - visualization
- *  3 - non-sending mode
+ *  8 - non-sending mode
  */
 int sending_mode = 3;  
 
-String dataCollection_prefix = "S";
-String dataCollection_suffix = "E";
+String dataCollection_endFlag= "S";
 
 #if defined(RIGHT_INSOLE)
   String visualisation_prefix = "R";
@@ -73,48 +70,45 @@ String dataCollection_suffix = "E";
   String visualization_suffix = "EL";
 #endif
 
-
-
 void setTimerInterval_(int interval, int *timer_id)
 {
-  timer_id = Timer.setInterval(interval,setSendFlag);
+  timer_id = Timer.setInterval(interval,sendEndFlag);
 }
-void sendDataCollectionData()
+
+void sendEndFlag()
 {
   if (sending_mode == 0)
   {
+    Serial.println();
+    Serial.println(dataCollection_endFlag);
+    isEnd = false;
     Timer.disable(timer_id);
-    Serial.println(dataCollection_prefix);
+    Timer.enable(prompt_timer_id);
     
-  #if defined(WITH_ACCEL)
-    Serial.print("x");
-    Serial.println(accel_x);
-    Serial.print("y");
-    Serial.println(accel_y);
-    Serial.print("z");
-    Serial.println(accel_z);
-    accel_x = "";
-    accel_y = "";
-    accel_z = "";
-  #endif
-    Serial.print("a");
-    Serial.println(s1_data);
-    Serial.print("b");
-    Serial.println(s2_data);
-    Serial.print("c");
-    Serial.println(s3_data);
-    Serial.print("d");
-    Serial.println(s4_data);
-    Serial.println(dataCollection_suffix);
-   
-    s1_data = "";
-    s2_data = "";
-    s3_data = "";
-    s4_data = "";
-    isSend = false;
-    Timer.enable(timer_id); 
   }
 }
+
+void prompt()
+{
+  if(sending_mode == 0)
+  {
+    if(prompt_counter == 3)
+    {
+      Serial.print("Make a whole step and back in ");
+    }
+    Serial.print(prompt_counter);Serial.print(".....");
+    prompt_counter--;
+    if(prompt_counter == 0 )
+    {
+      Serial.println();
+      prompt_counter = 3;
+      Timer.enable(timer_id); 
+      Timer.disable(prompt_timer_id);
+      
+    }
+  }
+}
+
 void sendVisualizationData()
 {
   if (sending_mode == 1)
@@ -135,23 +129,31 @@ void setup() {
   #if defined(WITH_ACCEL)
     accel.initialize();
     Serial.println(accel.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
-  
-    Serial.println("Updating internal sensor offsets...");
-
-    Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
-    Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
-    Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
-    
-    Serial.print("\n");
-    accel.setXAccelOffset(-937);
-    accel.setYAccelOffset(-2561);
-    accel.setZAccelOffset(1419);
-    Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
-    Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
-    Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
+//  
+//    Serial.println("Updating internal sensor offsets...");
+//
+//    Serial.print(accel.getXAccelOffset()); Serial.print("\t"); 
+//    Serial.print(accel.getYAccelOffset()); Serial.print("\t"); 
+//    Serial.print(accel.getZAccelOffset()); Serial.print("\t"); 
+//    
+//    Serial.print("\n");
+//    accel.setXAccelOffset(-2305);
+//    accel.setYAccelOffset(-2783);
+//    accel.setZAccelOffset(2976);
+//    Serial.print(accel.getXAccelOffset()); Serial.print("\t"); // -76
+//    Serial.print(accel.getYAccelOffset()); Serial.print("\t"); // -2359
+//    Serial.print(accel.getZAccelOffset()); Serial.print("\t"); // 1688
   #endif
-  setTimerInterval_(1000, &timer_id);
+  setTimerInterval_(2000, &timer_id);
+  prompt_timer_id = Timer.setInterval(1000, prompt);
   Timer.disable(timer_id);
+  Timer.disable(prompt_timer_id);
+  
+  Serial.println("Press: ");
+  Serial.println("0 for data collection");
+  Serial.println("1 for visualization");
+  Serial.println("8 for- non-sending mode");
+
 }
 
 void loop() {
@@ -176,7 +178,7 @@ void loop() {
     else if(data == '2'){
       Serial.flush();
       Timer.deleteTimer(timer_id);
-      setTimerInterval_(100, &timer_id);
+      setTimerInterval_(10, &timer_id);
       Timer.enable(timer_id);
     }
     else if(data == '3'){
@@ -212,18 +214,23 @@ void loop() {
     else if(data == '8'){
       Serial.flush();
       Timer.disable(timer_id);
+      Timer.disable(prompt_timer_id);
       sending_mode = 3;
     }
   }
-
+  Timer.run();
   if(sending_mode == 0)
   {
-    Timer.run();
-    getAllData();
-    if(isSend)
+    if(Timer.isEnabled(timer_id))
     {
-      sendDataCollectionData();
+      
+      sendData();
+      if(isEnd)
+      {
+        sendEndFlag();
+      }
     }
+    
   }
   if(sending_mode == 1)
   {
@@ -235,7 +242,6 @@ void loop() {
 }
 
 String make3Digits(int val){
-
   if(val <100){
     if (val > 9) {
        String new_val = "0" + (String) val;
@@ -247,10 +253,9 @@ String make3Digits(int val){
     }
  
   }
-  else{
+  else {
     return "100";  
   }
-  
 }
 
 void getVisualizationData()
@@ -262,25 +267,28 @@ void getVisualizationData()
     visualization_data+= make3Digits(map(analogRead(s4_p6),1023,500,0,100));
     visualization_data+= visualization_suffix;
 }
-void getAllData()
+void sendData()
 { 
-
+  String data = "";
   #if defined(WITH_ACCEL)
-  accel.getAcceleration(&ax,&ay,&az);
-  accel_x += ax;
-  accel_y += ay;
-  accel_z += az;
-  accel_x += ",";
-  accel_y += ",";
-  accel_z += ",";
+    accel.getAcceleration(&ax,&ay,&az);
+    data += ax;
+    data += ',';
+    data += ay;
+    data += ',';
+    data += az;
+    data += ',';
   #endif
-  s1_data += map(analogRead(s1_p1),1023,500,0,100);
-  s2_data += map(analogRead(s2_p4),1023,500,0,100);
-  s3_data += map(analogRead(s3_p5),1023,500,0,100);
-  s4_data += map(analogRead(s4_p6),1023,500,0,100);
-
-  s1_data += ",";
-  s2_data += ",";
-  s3_data += ",";
-  s4_data += ",";
+  int a = map(analogRead(s1_p1),1023,500,0,100);
+  int b = map(analogRead(s2_p4),1023,500,0,100);
+  int c = map(analogRead(s3_p5),1023,500,0,100);
+  int d = map(analogRead(s4_p6),1023,500,0,100);
+  data += (a)<100 ? a :100;
+  data += ',';
+  data += (b)<100 ? b :100;
+  data += ',';
+  data += (c)<100 ? c :100;
+  data += ',';
+  data += (d)<100 ? d :100;
+  Serial.println(data);
 }
