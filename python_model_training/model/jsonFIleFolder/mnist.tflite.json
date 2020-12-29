@@ -1,0 +1,56 @@
+{
+  "name": "IoTNet image classifier",
+  "description": "Identifies the movement direction of foot.",
+  "version": "v2",
+  "subgraph_metadata": [
+    {
+      "input_tensor_metadata": [
+        {
+          "name": "Sensor_Data",
+          "description": "Input Sensor Data to be classified. The expected Sensor Data is 7 x 350.",
+          "content": {
+            "content_properties_type": "ImageProperties",
+            "content_properties": {
+              "color_space": "GRAYSCALE"
+            }
+          },
+          "stats": {
+            "max": [
+              1.0
+            ],
+            "min": [
+              0.0
+            ]
+          }
+        }
+      ],
+      "output_tensor_metadata": [
+        {
+          "name": "probability",
+          "description": "Probabilities of the 10 labels respectively.",
+          "content": {
+            "content_properties_type": "FeatureProperties"
+          },
+          "stats": {
+            "max": [
+              1.0
+            ],
+            "min": [
+              0.0
+            ]
+          },
+          "associated_files": [
+            {
+              "name": "labels.txt",
+              "description": "Labels for movements that the model can recognize.",
+              "type": "TENSOR_VALUE_LABELS"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "author": "TensorFlow",
+  "license": "Apache License. Version 2.0 http://www.apache.org/licenses/LICENSE-2.0.",
+  "min_parser_version": "1.0.0"
+}
