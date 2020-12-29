@@ -9,11 +9,14 @@ from tflite_support import metadata as _metadata
 from tflite_support import metadata_schema_py_generated as _metadata_fb
 
 loader = Loader()
-train_ds, train_labels, test_ds, test_labels = loader.load()
-train_ds = np.transpose(train_ds,(0,2,1))
-test_ds = np.transpose(test_ds,(0,2,1))
-print(train_ds.shape)
-print(test_ds.shape)
+train_data, train_labels, val_data, val_labels, test_data, test_labels = loader.load()
+train_data = np.transpose(train_data,(0,2,1))
+val_data   = np.transpose(val_data,(0,2,1))
+test_data = np.transpose(test_data,(0,2,1))
+print(train_data.shape)
+print(val_data.shape)
+print(test_data.shape)
+
 
 model = tf.keras.Sequential([
   tf.keras.layers.InputLayer(input_shape=(7, 350)),
@@ -34,11 +37,13 @@ model.compile(optimizer='adam',
 
 
 # Train the digit classification model
-model.fit(train_ds, train_labels, epochs=10)
+model.fit(train_data, train_labels, epochs=10)
 
 model.summary()
-
-model.evaluate(test_ds, test_labels)
+print("Evaluation in val set:")
+model.evaluate(val_data, val_labels)
+print("Evaluation in test set:")
+model.evaluate(test_data, test_labels)
 
 # Convert Keras model to TF Lite format.
 converter = tf.lite.TFLiteConverter.from_keras_model(model)

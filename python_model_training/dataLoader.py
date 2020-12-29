@@ -19,6 +19,9 @@ class Loader():
         self.data[self.labels[2]] = np.load(os.path.join(self.dataset_path,self.labels[2]+'.npy')) 
         self.data[self.labels[3]] = np.load(os.path.join(self.dataset_path,self.labels[3]+'.npy')) 
         self.data[self.labels[4]] = np.load(os.path.join(self.dataset_path,self.labels[4]+'.npy')) 
+        self.test_data = OrderedDict()
+        self.test_data[self.labels[2]] = np.load(os.path.join("python_model_training/data/npy/Left_Foot_Valid", "valid_data_lf_left.npy"))
+        self.test_data[self.labels[1]] = np.load( os.path.join("python_model_training/data/npy/Left_Foot_Valid", "valid_data_lf_frontLeft.npy"))
 
     def load(self):
         label_idx = [0,1,2,3,4]
@@ -35,10 +38,27 @@ class Loader():
             if N_ == N: break
         train_data = np.array(all_data[:300,:,:])
         train_labels = np.array(all_labels[:300])
-        test_data = np.array(all_data[300:,:,:])
-        test_labels = np.array(all_labels[300:])
-        return train_data,train_labels,test_data,test_labels
+        val_data = np.array(all_data[300:,:,:])
+        val_labels = np.array(all_labels[300:])
+        
+        test_label_idx = [2,1]
+        N, H, W = self.num_samples_per_direction*len(test_label_idx), self.sample_size, 7
+        all_test_data = np.empty((N,H,W))
+        all_test_labels = []
+        N_ = 0
+        for i in range(N):
+            random.shuffle(test_label_idx)
+            for idx, label in enumerate(test_label_idx):
+                all_test_data[N_,:H,:] = tf.keras.utils.normalize(self.test_data[self.labels[label]][i,:H,:W])
+                all_test_labels.append(label)
+                N_+=1
+            if N_ == N: break
+        test_data = np.array(all_test_data)
+        test_labels = np.array(all_test_labels)
+
+        return train_data, train_labels, val_data, val_labels, test_data, test_labels
 
 
 # lf_loader = Loader()
-# lf_loader.load()
+# train_data, train_labels, val_data, val_labels, test_data, test_labels = lf_loader.load()
+# print(train_data.shape, train_labels.shape, val_data.shape, val_labels.shape, test_data.shape, test_labels.shape)

@@ -2,13 +2,16 @@ import pandas as pd
 import numpy as np
 from collections import OrderedDict
 
-lf_front =  pd.read_csv("data/raw/data_left100/Lf_100.csv")
-lf_left = pd.read_csv("data/raw/data_left100/Ll_100.csv")
-lf_frontLeft = pd.read_csv("data/raw/data_left100/Lfl_100.csv")
-lf_bottomLeft = pd.read_csv("data/raw/data_left100/Lbl_100.csv")
-lf_bottom =  pd.read_csv("data/raw/data_left100/Lb_100.csv")
-df_data = lf_bottom
-df_save_path = "data\lf_bottom.npy"
+# lf_front =  pd.read_csv("data/raw/data_left100/Lf_100.csv")
+# lf_left = pd.read_csv("data/raw/data_left100/Ll_100.csv")
+# lf_frontLeft = pd.read_csv("data/raw/data_left100/Lfl_100.csv")
+# lf_bottomLeft = pd.read_csv("data/raw/data_left100/Lbl_100.csv")
+# lf_bottom =  pd.read_csv("data/raw/data_left100/Lb_100.csv")
+valid_data_lf_frontLeft = pd.read_csv("python_model_training/data/raw/data_left100/data_2.csv")
+valid_data_lf_left = pd.read_csv("python_model_training/data/raw/data_left100/data_2.csv")
+
+df_data = valid_data_lf_left
+df_save_path = 'D:/Documents/GitHub/Insole-classification/python_model_training/data/npy/Left_Foot_Valid/valid_data_lf_left.npy'
 
 data_idx = 0
 zero_count = 0
