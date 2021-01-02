@@ -39,7 +39,7 @@ model.compile(optimizer='adam',
 # Train the digit classification model
 model.fit(train_data, train_labels, epochs=10)
 
-model.summary()
+# model.summary()
 print("Evaluation in val set:")
 model.evaluate(val_data, val_labels)
 print("Evaluation in test set:")

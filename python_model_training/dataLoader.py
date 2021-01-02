@@ -36,10 +36,10 @@ class Loader():
                 all_labels.append(label)
                 N_+=1
             if N_ == N: break
-        train_data = np.array(all_data[:300,:,:])
-        train_labels = np.array(all_labels[:300])
-        val_data = np.array(all_data[300:,:,:])
-        val_labels = np.array(all_labels[300:])
+        train_data = np.array(all_data[:400,:,:])
+        train_labels = np.array(all_labels[:400])
+        val_data = np.array(all_data[400:,:,:])
+        val_labels = np.array(all_labels[400:])
         
         test_label_idx = [2,1]
         N, H, W = self.num_samples_per_direction*len(test_label_idx), self.sample_size, 7
