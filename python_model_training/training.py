@@ -9,13 +9,13 @@ from tflite_support import metadata as _metadata
 from tflite_support import metadata_schema_py_generated as _metadata_fb
 
 loader = Loader()
-train_data, train_labels, val_data, val_labels, test_data, test_labels = loader.load()
+train_data, train_labels, val_data, val_labels= loader.load()
 train_data = np.transpose(train_data,(0,2,1))
 val_data   = np.transpose(val_data,(0,2,1))
-test_data = np.transpose(test_data,(0,2,1))
+# test_data = np.transpose(test_data,(0,2,1))
 print(train_data.shape)
 print(val_data.shape)
-print(test_data.shape)
+# print(test_data.shape)
 
 
 model = tf.keras.Sequential([
@@ -42,8 +42,8 @@ model.fit(train_data, train_labels, epochs=10)
 # model.summary()
 print("Evaluation in val set:")
 model.evaluate(val_data, val_labels)
-print("Evaluation in test set:")
-model.evaluate(test_data, test_labels)
+# print("Evaluation in test set:")
+# model.evaluate(test_data, test_labels)
 
 # Convert Keras model to TF Lite format.
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
@@ -64,7 +64,7 @@ print('which is about %d%% of the float model size.'\
       % (quantized_model_size * 100 / float_model_size))
 
 # Save the quantized model to file to the Downloads directory
-f = open('python_model_training\model\mnist.tflite', "wb")
+f = open('python_model_training\model\_mnist.tflite', "wb")
 f.write(tflite_quantized_model)
 f.close()
 
@@ -138,14 +138,14 @@ labelFile = open("python_model_training\data\labels.txt", "w")
 labelFile.write("lf_front,lf_frontLeft,lf_left,lf_bottomLeft,lf_bottom")
 labelFile.close()
 
-populator = _metadata.MetadataPopulator.with_model_file("python_model_training\model\mnist.tflite")
+populator = _metadata.MetadataPopulator.with_model_file("python_model_training\model\_mnist.tflite")
 populator.load_metadata_buffer(metadata_buf)
 populator.load_associated_files(["python_model_training\data\labels.txt"])
 populator.populate()
 
-displayer = _metadata.MetadataDisplayer.with_model_file("python_model_training\model\mnist.tflite")
+displayer = _metadata.MetadataDisplayer.with_model_file("python_model_training\model\_mnist.tflite")
 export_json_file = os.path.join("python_model_training\model\jsonFIleFolder/",
-                    "mnist.tflite" + ".json")
+                    "_mnist.tflite" + ".json")
 json_file = displayer.get_metadata_json()
 # Optional: write out the metadata as a json file
 with open(export_json_file, "w") as f:

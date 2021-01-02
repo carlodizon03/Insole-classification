@@ -10,8 +10,21 @@ from collections import OrderedDict
 valid_data_lf_frontLeft = pd.read_csv("python_model_training/data/raw/data_left100/data_2.csv")
 valid_data_lf_left = pd.read_csv("python_model_training/data/raw/data_left100/data_2.csv")
 
-df_data = valid_data_lf_left
-df_save_path = 'D:/Documents/GitHub/Insole-classification/python_model_training/data/npy/Left_Foot_Valid/valid_data_lf_left.npy'
+lf_valid_front = pd.read_csv("python_model_training\data/raw\data_left20\Lf_20.csv")
+lf_valid_left = pd.read_csv("python_model_training\data/raw\data_left20\Ll_20.csv")
+lf_valid_frontLeft = pd.read_csv("python_model_training\data/raw\data_left20\Lfl_20.csv")
+lf_valid_bottomLeft = pd.read_csv("python_model_training\data/raw\data_left20\Lbl_20.csv")
+lf_valid_bottom = pd.read_csv("python_model_training\data/raw\data_left20\Lb_20.csv")
+
+
+rf_front = pd.read_csv("python_model_training/data/raw/data_right100/Rf_100.csv")
+rf_frontRight = pd.read_csv("python_model_training/data/raw/data_right100/Rfr_100.csv")
+rf_right = pd.read_csv("python_model_training/data/raw/data_right100/Rr_100.csv")
+rf_bottomRight = pd.read_csv("python_model_training/data/raw/data_right100/Rbr_100.csv")
+rf_bottom = pd.read_csv("python_model_training/data/raw/data_right100/Rb_100.csv")
+
+df_data = lf_valid_bottom
+df_save_path = 'python_model_training\data/npy\Left_Foot_Valid/lf_valid_bottom.npy'
 
 data_idx = 0
 zero_count = 0
